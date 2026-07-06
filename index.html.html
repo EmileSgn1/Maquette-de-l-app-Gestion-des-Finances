@@ -1,0 +1,2459 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Mind Finances</title>
+  
+  <!-- Polices et Icônes -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  
+  <style>
+    :root {
+      --primary: #2E7D32;
+      --primary-light: #4CAF50;
+      --primary-dark: #1B5E20;
+      --accent: #FFC107;
+      --danger: #E53935;
+      --warning: #FF9800;
+      --success: #43A047;
+      --info: #1E88E5;
+      --bg: #F5F7FA;
+      --surface: #FFFFFF;
+      --text: #212121;
+      --text-secondary: #757575;
+      --divider: #E0E0E0;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+      --radius: 14px;
+      --font: 'Segoe UI', system-ui, sans-serif;
+    }
+
+    [data-theme="dark"] {
+      --bg: #121212;
+      --surface: #1E1E1E;
+      --text: #E0E0E0;
+      --text-secondary: #A0A0A0;
+      --divider: #333333;
+      --shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    /* Conteneur principal style Maquette Mobile */
+    #app {
+      max-width: 430px;
+      margin: 0 auto;
+      height: 100vh;
+      position: relative;
+      background: var(--bg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Écrans de navigation */
+    .screen {
+      display: none;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .screen.active {
+      display: flex;
+    }
+
+    /* En-têtes */
+    .header {
+      padding: 16px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--divider);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 10;
+    }
+
+    .header h1 {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .header .icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: var(--text);
+      font-size: 22px;
+      cursor: pointer;
+    }
+
+    /* Zones défilantes */
+    .scroll {
+      flex: 1;
+      overflow-y: auto;
+      padding: 16px 20px;
+    }
+
+    .scroll::-webkit-scrollbar {
+      width: 0;
+    }
+
+    /* Composants UI réutilisables */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 24px;
+      border-radius: 12px;
+      border: none;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s, opacity 0.15s;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1.5px solid var(--divider);
+      color: var(--text);
+    }
+
+    .btn-block {
+      width: 100%;
+    }
+
+    .input {
+      width: 100%;
+      padding: 14px 16px;
+      border: 1.5px solid var(--divider);
+      border-radius: 12px;
+      font-size: 16px;
+      background: var(--surface);
+      color: var(--text);
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .input:focus {
+      border-color: var(--primary);
+    }
+
+    .input-group {
+      margin-bottom: 16px;
+    }
+
+    .input-group label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    /* Bouton d'action flottant */
+    .fab {
+      position: fixed;
+      bottom: 90px;
+      right: 20px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      border: none;
+      font-size: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(46, 125, 50, 0.3);
+      cursor: pointer;
+      z-index: 50;
+    }
+
+    /* Navigation basse */
+    .bottom-nav {
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 0 12px;
+      background: var(--surface);
+      border-top: 1px solid var(--divider);
+      z-index: 50;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      padding: 4px 12px;
+      border: none;
+      background: transparent;
+      color: var(--text-secondary);
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .nav-item.active {
+      color: var(--primary);
+    }
+
+    .nav-item .material-icons {
+      font-size: 24px;
+    }
+
+    /* Menu latéral (Drawer) */
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 280px;
+      height: 100%;
+      background: var(--surface);
+      z-index: 100;
+      transform: translateX(-100%);
+      transition: transform 0.3s;
+      box-shadow: 2px 0 12px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .drawer.open {
+      transform: translateX(0);
+    }
+
+    .drawer-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 99;
+      display: none;
+    }
+
+    .drawer-overlay.show {
+      display: block;
+    }
+
+    .drawer-header {
+      padding: 24px 20px;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+    }
+
+    .drawer-header h3 {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .drawer-header p {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .drawer-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      font-size: 15px;
+      width: 100%;
+      text-align: left;
+      cursor: pointer;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .drawer-item:hover {
+      background: rgba(0, 0, 0, 0.03);
+    }
+
+    /* Modales */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 200;
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--surface);
+      width: 100%;
+      max-width: 430px;
+      border-radius: 20px 20px 0 0;
+      padding: 20px;
+      max-height: 85vh;
+      overflow-y: auto;
+      animation: slideUp 0.25s;
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+
+    .modal h3 {
+      margin-bottom: 16px;
+      font-size: 18px;
+    }
+
+    .modal-btns {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    /* Éléments de retour d'information (Toasts, Badges) */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%) translateY(100px);
+      background: #333333;
+      color: white;
+      padding: 12px 24px;
+      border-radius: 24px;
+      font-size: 14px;
+      z-index: 300;
+      opacity: 0;
+      transition: all 0.3s;
+    }
+
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .badge-success { background: #E8F5E9; color: var(--success); }
+    .badge-danger { background: #FFEBEE; color: var(--danger); }
+    .badge-warning { background: #FFF3E0; color: var(--warning); }
+
+    /* Graphiques et Listes */
+    .chart-container {
+      position: relative;
+      height: 200px;
+      margin: 16px 0;
+    }
+
+    .list-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 0;
+      border-bottom: 1px solid var(--divider);
+    }
+
+    .list-item:last-child {
+      border-bottom: none;
+    }
+
+    .list-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .list-info {
+      flex: 1;
+    }
+
+    .list-info h4 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .list-info p {
+      font-size: 13px;
+      color: var(--text-secondary);
+    }
+
+    .list-amount {
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      padding: 8px 16px;
+      border-radius: 20px;
+      border: none;
+      background: var(--divider);
+      color: var(--text-secondary);
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: var(--primary);
+      color: white;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: var(--divider);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+
+    .search-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--surface);
+      padding: 10px 16px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      border: 1px solid var(--divider);
+    }
+
+    .search-bar input {
+      flex: 1;
+      border: none;
+      background: transparent;
+      font-size: 15px;
+      outline: none;
+      color: var(--text);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 20px;
+      color: var(--text-secondary);
+    }
+
+    .empty-state .material-icons {
+      font-size: 64px;
+      margin-bottom: 16px;
+      opacity: 0.4;
+    }
+
+    .toggle-switch {
+      position: relative;
+      width: 48px;
+      height: 28px;
+      background: var(--divider);
+      border-radius: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .toggle-switch.on {
+      background: var(--primary);
+    }
+
+    .toggle-switch::after {
+      content: '';
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      background: white;
+      border-radius: 50%;
+      top: 2px;
+      left: 2px;
+      transition: transform 0.2s;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+
+    .toggle-switch.on::after {
+      transform: translateX(20px);
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card h3 {
+      font-size: 13px;
+      color: var(--text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .stat-card .amount {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .income { color: var(--success); }
+    .expense { color: var(--danger); }
+
+    /* Écran de démarrage (Splash) */
+    .splash {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      z-index: 500;
+      transition: opacity 0.5s;
+    }
+
+    .splash.hide {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash h1 {
+      font-size: 36px;
+      margin-top: 20px;
+    }
+
+    .splash p {
+      margin-top: 8px;
+      opacity: 0.85;
+      font-size: 16px;
+    }
+
+    /* Onboarding */
+    .onboarding {
+      text-align: center;
+      padding: 40px 30px;
+    }
+
+    .onboarding img {
+      width: 200px;
+      height: 200px;
+      margin-bottom: 24px;
+    }
+
+    .onboarding h2 {
+      font-size: 24px;
+      margin-bottom: 12px;
+    }
+
+    .onboarding p {
+      color: var(--text-secondary);
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .dots {
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+      margin-top: 24px;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--divider);
+    }
+
+    .dot.active {
+      background: var(--primary);
+    }
+
+    /* Calendrier de planification */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+
+    .calendar-day {
+      padding: 8px;
+      border-radius: 8px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    .calendar-day.today {
+      background: var(--primary);
+      color: white;
+    }
+
+    .calendar-day.has-event::after {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 4px;
+      background: var(--accent);
+      border-radius: 50%;
+      margin: 2px auto 0;
+    }
+
+    /* Célébrations de paliers */
+    .confetti {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 400;
+      overflow: hidden;
+    }
+
+    .confetti-piece {
+      position: absolute;
+      width: 10px;
+      height: 10px;
+      background: var(--primary);
+      animation: confetti-fall 2s linear forwards;
+    }
+
+    @keyframes confetti-fall {
+      0% { transform: translateY(-10vh) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+    }
+
+    .avatar {
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .receipt-preview {
+      width: 100%;
+      height: 160px;
+      border: 2px dashed var(--divider);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      margin-top: 8px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .receipt-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  </style>
+</head>
+<body>
+
+<div id="app">
+  <!-- Splash Screen -->
+  <div class="splash" id="splash">
+    <span class="material-icons" style="font-size:72px;">account_balance_wallet</span>
+    <h1>Mind Finances</h1>
+    <p>Votre compagnon budgétaire de confiance</p>
+  </div>
+
+  <!-- Onboarding -->
+  <div class="screen" id="screen-onboarding">
+    <div class="scroll" style="display:flex; flex-direction:column; justify-content:center;">
+      <div id="onboarding-slides">
+        <div class="onboarding" data-index="0">
+          <span class="material-icons" style="font-size:120px; color:var(--primary);">trending_up</span>
+          <h2>Suivez votre argent</h2>
+          <p>Gardez un œil sur vos entrées et sorties au même endroit. Sachez précisément où va chaque franc.</p>
+        </div>
+        <div class="onboarding" data-index="1" style="display:none;">
+          <span class="material-icons" style="font-size:120px; color:var(--primary);">savings</span>
+          <h2>Épargnez intelligemment</h2>
+          <p>Fixez-vous des budgets et des objectifs. Recevez des alertes pour tenir vos engagements financiers.</p>
+        </div>
+        <div class="onboarding" data-index="2" style="display:none;">
+          <span class="material-icons" style="font-size:120px; color:var(--primary);">insights</span>
+          <h2>Visualisez vos tendances</h2>
+          <p>Des analyses claires vous aident à comprendre vos habitudes et à optimiser vos dépenses au quotidien.</p>
+        </div>
+      </div>
+      <div class="dots" id="onboarding-dots">
+        <div class="dot active"></div>
+        <div class="dot"></div>
+        <div class="dot"></div>
+      </div>
+      <div style="padding:24px 30px;">
+        <button class="btn btn-primary btn-block" onclick="nextOnboarding()" id="onboarding-btn">Suivant</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Authentification -->
+  <div class="screen" id="screen-login">
+    <div class="scroll" style="display:flex; flex-direction:column; justify-content:center;">
+      <div style="text-align:center; margin-bottom:32px;">
+        <span class="material-icons" style="font-size:64px; color:var(--primary);">account_balance_wallet</span>
+        <h2 style="margin-top:16px;">Ravi de vous revoir</h2>
+        <p style="color:var(--text-secondary); margin-top:8px;">Connectez-vous pour gérer vos finances</p>
+      </div>
+      <div style="padding:0 20px;">
+        <input class="input" type="email" id="login-email" placeholder="Adresse Email">
+        <input class="input" type="password" id="login-password" placeholder="Mot de passe">
+        <div style="text-align:right; margin-bottom:16px;">
+          <a href="#" onclick="navigateTo('forgot-password')" style="color:var(--primary); font-size:14px; text-decoration:none;">Mot de passe oublié ?</a>
+        </div>
+        <button class="btn btn-primary btn-block" onclick="login()">Se connecter</button>
+        <p style="text-align:center; margin-top:20px; font-size:14px;">
+          Nouveau sur l'application ? <a href="#" onclick="navigateTo('register')" style="color:var(--primary); text-decoration:none; font-weight:600;">Créer un compte</a>
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-register">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('login')"><span class="material-icons">arrow_back</span></button>
+      <h1>Inscription</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <input class="input" type="text" id="reg-name" placeholder="Nom complet">
+      <input class="input" type="email" id="reg-email" placeholder="Adresse Email">
+      <input class="input" type="password" id="reg-password" placeholder="Mot de passe (min. 6 caractères)">
+      <input class="input" type="password" id="reg-confirm" placeholder="Confirmer le mot de passe">
+      <button class="btn btn-primary btn-block" onclick="register()" style="margin-top:8px;">Créer mon compte</button>
+      <p style="text-align:center; margin-top:16px; font-size:14px;">
+        Déjà un compte ? <a href="#" onclick="navigateTo('login')" style="color:var(--primary); text-decoration:none; font-weight:600;">Se connecter</a>
+      </p>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-forgot-password">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('login')"><span class="material-icons">arrow_back</span></button>
+      <h1>Récupération</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <p style="margin-bottom:20px; color:var(--text-secondary);">Saisissez votre email. Un code de vérification vous sera envoyé.</p>
+      <input class="input" type="email" id="forgot-email" placeholder="Adresse Email">
+      <button class="btn btn-primary btn-block" onclick="sendOTP()">Envoyer le code</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-otp">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('forgot-password')"><span class="material-icons">arrow_back</span></button>
+      <h1>Vérification</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <p style="margin-bottom:20px; color:var(--text-secondary);">Entrez le code à 6 chiffres reçu dans votre boîte de réception.</p>
+      <input class="input" type="text" id="otp-code" placeholder="123456" maxlength="6">
+      <button class="btn btn-primary btn-block" onclick="verifyOTP()">Vérifier</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-reset-password">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('login')"><span class="material-icons">arrow_back</span></button>
+      <h1>Nouveau mot de passe</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <input class="input" type="password" id="new-password" placeholder="Nouveau mot de passe">
+      <input class="input" type="password" id="new-confirm" placeholder="Confirmer le mot de passe">
+      <button class="btn btn-primary btn-block" onclick="resetPassword()">Réinitialiser</button>
+    </div>
+  </div>
+
+  <!-- Tableau de bord principal -->
+  <div class="screen active" id="screen-dashboard">
+    <div class="header">
+      <button class="icon-btn" onclick="openDrawer()"><span class="material-icons">menu</span></button>
+      <h1>Tableau de bord</h1>
+      <button class="icon-btn" onclick="navigateTo('notifications')"><span class="material-icons">notifications</span></button>
+    </div>
+    <div class="scroll">
+      <div class="card" style="background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:white;">
+        <p style="opacity:0.85; font-size:13px;">Solde total disponible</p>
+        <h2 style="font-size:28px; margin-top:4px;" id="dash-balance">0 F CFA</h2>
+        <div class="grid-2" style="margin-top:16px;">
+          <div>
+            <p style="opacity:0.8; font-size:12px;">REVENUS</p>
+            <p style="font-size:18px; font-weight:700;" id="dash-income">0 F CFA</p>
+          </div>
+          <div>
+            <p style="opacity:0.8; font-size:12px;">DÉPENSES</p>
+            <p style="font-size:18px; font-weight:700;" id="dash-expense">0 F CFA</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:12px; font-size:16px;">Répartition des dépenses</h3>
+        <div class="chart-container"><canvas id="expenseChart"></canvas></div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h3 style="font-size:16px;">Opérations récentes</h3>
+          <a href="#" onclick="navigateTo('expenses-list')" style="color:var(--primary); font-size:13px; text-decoration:none;">Voir tout</a>
+        </div>
+        <div id="dash-transactions"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:12px; font-size:16px;">Suivi des Budgets</h3>
+        <div id="dash-budgets"></div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:12px; font-size:16px;">Échéances à venir</h3>
+        <div id="dash-upcoming"></div>
+      </div>
+    </div>
+    <button class="fab" onclick="showAddOptions()"><span class="material-icons">add</span></button>
+  </div>
+
+  <!-- Gestion des revenus -->
+  <div class="screen" id="screen-income-list">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('dashboard')"><span class="material-icons">arrow_back</span></button>
+      <h1>Revenus</h1>
+      <button class="icon-btn" onclick="navigateTo('income-add')"><span class="material-icons">add</span></button>
+    </div>
+    <div class="scroll">
+      <div class="search-bar">
+        <span class="material-icons" style="color:var(--text-secondary);">search</span>
+        <input type="text" id="income-search" placeholder="Rechercher un revenu..." oninput="renderIncome()">
+      </div>
+      <div id="income-list"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-income-add">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('income-list')"><span class="material-icons">arrow_back</span></button>
+      <h1 id="income-form-title">Ajouter un revenu</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <div class="input-group"><label>Montant (F CFA)</label><input class="input" type="number" id="inc-amount" placeholder="0"></div>
+      <div class="input-group"><label>Source / Description</label><input class="input" type="text" id="inc-desc" placeholder="Ex: Salaire, Freelance, Vente"></div>
+      <div class="input-group"><label>Catégorie</label><select class="input" id="inc-category"></select></div>
+      <div class="input-group"><label>Date</label><input class="input" type="date" id="inc-date"></div>
+      <div class="input-group"><label>Note additionnelle (optionnel)</label><input class="input" type="text" id="inc-note" placeholder="Plus de précisions..."></div>
+      <button class="btn btn-primary btn-block" onclick="saveIncome()">Enregistrer</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-income-detail">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('income-list')"><span class="material-icons">arrow_back</span></button>
+      <h1>Détails du revenu</h1>
+      <div></div>
+    </div>
+    <div class="scroll" id="income-detail-content"></div>
+  </div>
+
+  <!-- Gestion des dépenses -->
+  <div class="screen" id="screen-expenses-list">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('dashboard')"><span class="material-icons">arrow_back</span></button>
+      <h1>Dépenses</h1>
+      <button class="icon-btn" onclick="navigateTo('expense-add')"><span class="material-icons">add</span></button>
+    </div>
+    <div class="scroll">
+      <div class="search-bar">
+        <span class="material-icons" style="color:var(--text-secondary);">search</span>
+        <input type="text" id="expense-search" placeholder="Rechercher une dépense..." oninput="renderExpenses()">
+      </div>
+      <div style="display:flex; gap:8px; margin-bottom:12px; overflow-x:auto;">
+        <button class="tab active" onclick="filterExpenses('all', this)">Toutes</button>
+        <button class="tab" onclick="filterExpenses('Alimentation', this)">Alimentation</button>
+        <button class="tab" onclick="filterExpenses('Transport', this)">Transport</button>
+        <button class="tab" onclick="filterExpenses('Shopping', this)">Shopping</button>
+        <button class="tab" onclick="filterExpenses('Factures', this)">Factures</button>
+      </div>
+      <div id="expense-list"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-expense-add">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('expenses-list')"><span class="material-icons">arrow_back</span></button>
+      <h1 id="expense-form-title">Ajouter une dépense</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <div class="input-group"><label>Montant (F CFA)</label><input class="input" type="number" id="exp-amount" placeholder="0"></div>
+      <div class="input-group"><label>Description</label><input class="input" type="text" id="exp-desc" placeholder="Ex: Courses supermarché, Facture SBEE"></div>
+      <div class="input-group"><label>Catégorie</label><select class="input" id="exp-category"></select></div>
+      <div class="input-group"><label>Date</label><input class="input" type="date" id="exp-date"></div>
+      <div class="input-group"><label>Moyen de paiement</label>
+        <select class="input" id="exp-method">
+          <option>Espèces</option>
+          <option>Mobile Money (MTN/Moov)</option>
+          <option>Carte Bancaire</option>
+          <option>Virement Bancaire</option>
+        </select>
+      </div>
+      <div class="input-group">
+        <label>Justificatif / Reçu</label>
+        <div class="receipt-preview" onclick="document.getElementById('receipt-input').click()">
+          <span class="material-icons">add_a_photo</span>
+          <span style="margin-left:8px;">Ajouter une photo</span>
+        </div>
+        <input type="file" id="receipt-input" accept="image/*" style="display:none;" onchange="previewReceipt(this)">
+      </div>
+      <div class="input-group"><label>Note additionnelle (optionnel)</label><input class="input" type="text" id="exp-note" placeholder="Détails à ajouter..."></div>
+      <button class="btn btn-primary btn-block" onclick="saveExpense()">Enregistrer la dépense</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-expense-detail">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('expenses-list')"><span class="material-icons">arrow_back</span></button>
+      <h1>Détails de la dépense</h1>
+      <div></div>
+    </div>
+    <div class="scroll" id="expense-detail-content"></div>
+  </div>
+
+  <!-- Catégories -->
+  <div class="screen" id="screen-categories">
+    <div class="header">
+      <button class="icon-btn" onclick="openDrawer()"><span class="material-icons">menu</span></button>
+      <h1>Catégories</h1>
+      <button class="icon-btn" onclick="navigateTo('category-add')"><span class="material-icons">add</span></button>
+    </div>
+    <div class="scroll">
+      <div class="tabs">
+        <button class="tab active" onclick="switchCatTab('expense', this)">Dépenses</button>
+        <button class="tab" onclick="switchCatTab('income', this)">Revenus</button>
+      </div>
+      <div id="category-list"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-category-add">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('categories')"><span class="material-icons">arrow_back</span></button>
+      <h1 id="cat-form-title">Créer une catégorie</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <div class="input-group"><label>Nom de la catégorie</label><input class="input" type="text" id="cat-name" placeholder="Ex: Restaurant, Carburant"></div>
+      <div class="input-group"><label>Type d'opération</label><select class="input" id="cat-type"><option value="expense">Dépense</option><option value="income">Revenu</option></select></div>
+      <div class="input-group"><label>Icône visuelle</label><div id="cat-icon-grid" style="display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:8px;"></div></div>
+      <div class="input-group"><label>Couleur associée</label><div id="cat-color-grid" style="display:grid; grid-template-columns:repeat(6,1fr); gap:8px; margin-top:8px;"></div></div>
+      <input type="hidden" id="cat-selected-icon" value="category">
+      <input type="hidden" id="cat-selected-color" value="#2E7D32">
+      <button class="btn btn-primary btn-block" onclick="saveCategory()">Créer la catégorie</button>
+    </div>
+  </div>
+
+  <!-- Budgets -->
+  <div class="screen" id="screen-budget-list">
+    <div class="header">
+      <button class="icon-btn" onclick="openDrawer()"><span class="material-icons">menu</span></button>
+      <h1>Budgets</h1>
+      <button class="icon-btn" onclick="navigateTo('budget-add')"><span class="material-icons">add</span></button>
+    </div>
+    <div class="scroll">
+      <div id="budget-list"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-budget-add">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('budget-list')"><span class="material-icons">arrow_back</span></button>
+      <h1 id="budget-form-title">Allouer un budget</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <div class="input-group"><label>Sélectionner une catégorie</label><select class="input" id="bud-category"></select></div>
+      <div class="input-group"><label>Plafond limite (F CFA)</label><input class="input" type="number" id="bud-amount" placeholder="0"></div>
+      <div class="input-group"><label>Périodicité</label><select class="input" id="bud-period"><option>Mensuel</option><option>Hebdomadaire</option><option>Annuel</option></select></div>
+      <div class="input-group"><label>Date d'effet</label><input class="input" type="date" id="bud-start"></div>
+      <button class="btn btn-primary btn-block" onclick="saveBudget()">Valider le budget</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-budget-detail">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('budget-list')"><span class="material-icons">arrow_back</span></button>
+      <h1>Suivi détaillé</h1>
+      <div></div>
+    </div>
+    <div class="scroll" id="budget-detail-content"></div>
+  </div>
+
+  <!-- Planification -->
+  <div class="screen" id="screen-planning">
+    <div class="header">
+      <button class="icon-btn" onclick="openDrawer()"><span class="material-icons">menu</span></button>
+      <h1>Planification</h1>
+      <button class="icon-btn" onclick="navigateTo('planning-add')"><span class="material-icons">add</span></button>
+    </div>
+    <div class="scroll">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <button class="icon-btn" onclick="changeMonth(-1)"><span class="material-icons">chevron_left</span></button>
+          <h3 id="cal-month">Juillet 2026</h3>
+          <button class="icon-btn" onclick="changeMonth(1)"><span class="material-icons">chevron_right</span></button>
+        </div>
+        <div class="calendar-grid" id="cal-grid"></div>
+      </div>
+      <div id="planning-list"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-planning-add">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('planning')"><span class="material-icons">arrow_back</span></button>
+      <h1 id="plan-form-title">Prévoir une échéance</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <div class="input-group"><label>Libellé du paiement</label><input class="input" type="text" id="plan-title" placeholder="Ex: Loyer, Abonnement Internet"></div>
+      <div class="input-group"><label>Montant prévu (F CFA)</label><input class="input" type="number" id="plan-amount" placeholder="0"></div>
+      <div class="input-group"><label>Catégorie</label><select class="input" id="plan-category"></select></div>
+      <div class="input-group"><label>Date limite de paiement</label><input class="input" type="date" id="plan-date"></div>
+      <div class="input-group"><label>Répétition périodique</label><select class="input" id="plan-repeat"><option>Jamais</option><option>Chaque jour</option><option>Chaque semaine</option><option>Chaque mois</option><option>Chaque année</option></select></div>
+      <button class="btn btn-primary btn-block" onclick="savePlanning()">Enregistrer la prévision</button>
+    </div>
+  </div>
+
+  <!-- Épargne & Objectifs -->
+  <div class="screen" id="screen-savings">
+    <div class="header">
+      <button class="icon-btn" onclick="openDrawer()"><span class="material-icons">menu</span></button>
+      <h1>Objectifs d'Épargne</h1>
+      <button class="icon-btn" onclick="navigateTo('savings-add')"><span class="material-icons">add</span></button>
+    </div>
+    <div class="scroll">
+      <div id="savings-list"></div>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-savings-add">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('savings')"><span class="material-icons">arrow_back</span></button>
+      <h1 id="savings-form-title">Créer un objectif</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <div class="input-group"><label>Intitulé du projet</label><input class="input" type="text" id="save-name" placeholder="Ex: Achat Moto, Fonds de secours"></div>
+      <div class="input-group"><label>Montant cible (F CFA)</label><input class="input" type="number" id="save-target" placeholder="0"></div>
+      <div class="input-group"><label>Montant initial déjà épargné</label><input class="input" type="number" id="save-current" placeholder="0" value="0"></div>
+      <div class="input-group"><label>Date butoir souhaitée</label><input class="input" type="date" id="save-date"></div>
+      <button class="btn btn-primary btn-block" onclick="saveSavings()">Créer l'objectif</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-savings-detail">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('savings')"><span class="material-icons">arrow_back</span></button>
+      <h1>Suivi du projet</h1>
+      <div></div>
+    </div>
+    <div class="scroll" id="savings-detail-content"></div>
+  </div>
+
+  <!-- Statistiques & Rapports -->
+  <div class="screen" id="screen-statistics">
+    <div class="header">
+      <button class="icon-btn" onclick="openDrawer()"><span class="material-icons">menu</span></button>
+      <h1>Analyses & Rapports</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <div class="tabs">
+        <button class="tab active" onclick="switchStatPeriod('month', this)">Vue Mensuelle</button>
+        <button class="tab" onclick="switchStatPeriod('year', this)">Vue Annuelle</button>
+      </div>
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="stat-card"><h3>Entrées totales</h3><div class="amount income" id="stat-income">0 F CFA</div></div>
+        <div class="stat-card"><h3>Sorties totales</h3><div class="amount expense" id="stat-expense">0 F CFA</div></div>
+      </div>
+      <div class="card"><h3>Revenus vs Dépenses</h3><div class="chart-container"><canvas id="barChart"></canvas></div></div>
+      <div class="card"><h3>Distribution des postes de dépenses</h3><div class="chart-container"><canvas id="pieChart"></canvas></div></div>
+      <div class="card"><h3>Évolution des flux</h3><div class="chart-container"><canvas id="lineChart"></canvas></div></div>
+      <button class="btn btn-outline btn-block" onclick="showToast('Rapport exporté au format PDF !')">Exporter les données</button>
+    </div>
+  </div>
+
+  <!-- Notifications -->
+  <div class="screen" id="screen-notifications">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('dashboard')"><span class="material-icons">arrow_back</span></button>
+      <h1>Notifications</h1>
+      <button class="icon-btn" onclick="markAllRead()"><span class="material-icons">done_all</span></button>
+    </div>
+    <div class="scroll" id="notification-list"></div>
+  </div>
+
+  <!-- Historique Global -->
+  <div class="screen" id="screen-history">
+    <div class="header">
+      <button class="icon-btn" onclick="openDrawer()"><span class="material-icons">menu</span></button>
+      <h1>Historique des flux</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <div class="search-bar">
+        <span class="material-icons" style="color:var(--text-secondary);">search</span>
+        <input type="text" id="hist-search" placeholder="Rechercher dans l'historique..." oninput="renderHistory()">
+      </div>
+      <div id="history-list"></div>
+    </div>
+  </div>
+
+  <!-- Profil & Paramètres -->
+  <div class="screen" id="screen-profile">
+    <div class="header">
+      <button class="icon-btn" onclick="openDrawer()"><span class="material-icons">menu</span></button>
+      <h1>Mon Profil</h1>
+      <button class="icon-btn" onclick="navigateTo('profile-edit')"><span class="material-icons">edit</span></button>
+    </div>
+    <div class="scroll">
+      <div style="text-align:center; margin-bottom:24px;">
+        <div class="avatar" style="margin:0 auto; font-size:32px; width:80px; height:80px;">ME</div>
+        <h2 style="margin-top:12px;">Mind Emile</h2>
+        <p style="color:var(--text-secondary);">emile@mindtech.bj</p>
+        <span class="badge badge-success" style="margin-top:8px;">Compte Professionnel</span>
+      </div>
+      <div class="card">
+        <div class="list-item"><span class="material-icons" style="color:var(--primary);">phone</span><div class="list-info"><h4>Téléphone</h4><p>+229 01 00 00 00 00</p></div></div>
+        <div class="list-item"><span class="material-icons" style="color:var(--primary);">location_on</span><div class="list-info"><h4>Localisation</h4><p>Abomey-Calavi, Bénin</p></div></div>
+        <div class="list-item"><span class="material-icons" style="color:var(--primary);">calendar_today</span><div class="list-info"><h4>Utilisateur depuis</h4><p>Juillet 2026</p></div></div>
+      </div>
+      <button class="btn btn-outline btn-block" onclick="navigateTo('settings')" style="margin-top:8px;">Accéder aux options</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-profile-edit">
+    <div class="header">
+      <button class="icon-btn" onclick="navigateTo('profile')"><span class="material-icons">arrow_back</span></button>
+      <h1>Modifier le profil</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <div style="text-align:center; margin-bottom:20px;">
+        <div class="avatar" style="margin:0 auto;">ME</div>
+        <p style="margin-top:8px; color:var(--primary); font-size:14px; cursor:pointer;">Changer la photo</p>
+      </div>
+      <div class="input-group"><label>Nom d'affichage</label><input class="input" type="text" value="Mind Emile"></div>
+      <div class="input-group"><label>Adresse Email</label><input class="input" type="email" value="emile@mindtech.bj"></div>
+      <div class="input-group"><label>Numéro de téléphone</label><input class="input" type="text" value="+229 01 00 00 00 00"></div>
+      <div class="input-group"><label>Ville / Région</label><input class="input" type="text" value="Abomey-Calavi, Bénin"></div>
+      <button class="btn btn-primary btn-block" onclick="saveProfile()">Enregistrer les modifications</button>
+    </div>
+  </div>
+
+  <div class="screen" id="screen-settings">
+    <div class="header">
+      <button class="icon-btn" onclick="openDrawer()"><span class="material-icons">menu</span></button>
+      <h1>Paramètres</h1>
+      <div></div>
+    </div>
+    <div class="scroll">
+      <div class="card">
+        <div class="list-item" style="justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <span class="material-icons" style="color:var(--primary);">dark_mode</span>
+            <div class="list-info"><h4>Mode Sombre</h4></div>
+          </div>
+          <div class="toggle-switch" id="darkToggle" onclick="toggleDark()"></div>
+        </div>
+        <div class="list-item" style="justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:14px;">
+            <span class="material-icons" style="color:var(--primary);">notifications</span>
+            <div class="list-info"><h4>Notifications Push</h4></div>
+          </div>
+          <div class="toggle-switch on" onclick="this.classList.toggle('on')"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="list-item" onclick="showToast('Langue par défaut : Français')">
+          <span class="material-icons" style="color:var(--primary);">language</span>
+          <div class="list-info"><h4>Langue de l'application</h4><p>Français</p></div>
+          <span class="material-icons">chevron_right</span>
+        </div>
+        <div class="list-item" onclick="showToast('Devise configurée : FCFA')">
+          <span class="material-icons" style="color:var(--primary);">attach_money</span>
+          <div class="list-info"><h4>Devise principale</h4><p>FCFA (F CFA)</p></div>
+          <span class="material-icons">chevron_right</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="list-item" onclick="showToast('Sauvegarde réussie dans le cloud !')"><span class="material-icons" style="color:var(--primary);">backup</span><div class="list-info"><h4>Sauvegarder les données</h4></div><span class="material-icons">chevron_right</span></div>
+        <div class="list-item" onclick="showToast('Données synchronisées !')"><span class="material-icons" style="color:var(--primary);">restore</span><div class="list-info"><h4>Restaurer une sauvegarde</h4></div><span class="material-icons">chevron_right</span></div>
+      </div>
+      <button class="btn btn-danger btn-block" onclick="logout()" style="margin-top:8px;">Se déconnecter</button>
+    </div>
+  </div>
+
+  <!-- Barre de navigation basse (Bottom Nav) -->
+  <div class="bottom-nav" id="bottom-nav">
+    <button class="nav-item active" onclick="navigateTo('dashboard')"><span class="material-icons">dashboard</span>Accueil</button>
+    <button class="nav-item" onclick="navigateTo('income-list')"><span class="material-icons">trending_up</span>Revenus</button>
+    <button class="nav-item" onclick="navigateTo('expenses-list')"><span class="material-icons">trending_down</span>Dépenses</button>
+    <button class="nav-item" onclick="navigateTo('planning')"><span class="material-icons">event</span>Planning</button>
+    <button class="nav-item" onclick="navigateTo('statistics')"><span class="material-icons">bar_chart</span>Analyses</button>
+  </div>
+
+  <!-- Menu de navigation latéral (Drawer Contextuel) -->
+  <div class="drawer-overlay" id="drawer-overlay" onclick="closeDrawer()"></div>
+  <div class="drawer" id="drawer">
+    <div class="drawer-header">
+      <h3>Mind Emile</h3>
+      <p>emile@mindtech.bj</p>
+    </div>
+    <button class="drawer-item" onclick="navigateTo('profile'); closeDrawer()"><span class="material-icons">person</span>Profil</button>
+    <button class="drawer-item" onclick="navigateTo('budget-list'); closeDrawer()"><span class="material-icons">account_balance_wallet</span>Budgets alloués</button>
+    <button class="drawer-item" onclick="navigateTo('categories'); closeDrawer()"><span class="material-icons">category</span>Catégories d'opérations</button>
+    <button class="drawer-item" onclick="navigateTo('savings'); closeDrawer()"><span class="material-icons">savings</span>Objectifs d'épargne</button>
+    <button class="drawer-item" onclick="navigateTo('notifications'); closeDrawer()"><span class="material-icons">notifications</span>Notifications</button>
+    <button class="drawer-item" onclick="navigateTo('history'); closeDrawer()"><span class="material-icons">history</span>Historique centralisé</button>
+    <button class="drawer-item" onclick="navigateTo('settings'); closeDrawer()"><span class="material-icons">settings</span>Paramètres de l'application</button>
+    <button class="drawer-item" onclick="logout(); closeDrawer()"><span class="material-icons">logout</span>Déconnexion</button>
+  </div>
+
+  <!-- Structure de base des modales contextuelles -->
+  <div class="modal-overlay" id="modal-overlay" onclick="if(event.target === this) closeModal()">
+    <div class="modal" id="modal">
+      <h3 id="modal-title">Titre</h3>
+      <p id="modal-body">Description</p>
+      <div class="modal-btns" id="modal-btns"></div>
+    </div>
+  </div>
+
+  <!-- Petits utilitaires d'interface graphiques (Toast notification, Zone de confettis) -->
+  <div class="toast" id="toast">Message</div>
+  <div class="confetti" id="confetti"></div>
+</div>
+
+<script>
+  // -- ÉTATS GLOBAUX DU CLIENT DE L'APPLICATION --
+  let currentScreen = 'screen-dashboard';
+  let editingId = null;
+  let editingType = null;
+  let expenseFilter = 'all';
+  let catTab = 'expense';
+  let statPeriod = 'month';
+  let currentMonth = new Date();
+  let darkMode = false;
+
+  // Configuration graphique dynamique pour les icônes et nuanciers de catégories
+  const icons = ['shopping_cart', 'restaurant', 'directions_car', 'home', 'bolt', 'local_hospital', 'school', 'flight', 'pets', 'movie', 'fitness_center', 'card_giftcard', 'attach_money', 'work', 'trending_up', 'savings', 'build', 'phone', 'wifi', 'water_drop'];
+  const colors = ['#E53935', '#D81B60', '#8E24AA', '#5E35B1', '#3949AB', '#1E88E5', '#039BE5', '#00ACC1', '#00897B', '#43A047', '#7CB342', '#C0CA33', '#FDD835', '#FFB300', '#FB8C00', '#F4511E', '#6D4C41', '#757575', '#546E7A', '#2E7D32'];
+
+  // Base de données locale typique pour tester de façon vivante l'interface utilisateur au démarrage
+  let data = {
+    income: [
+      { id: 1, amount: 450000, desc: 'Contrat Freelance Node.js', category: 'Freelance', date: '2026-06-01', note: '' },
+      { id: 2, amount: 150000, desc: 'Maintenance Plateforme GénieMémoire', category: 'Freelance', date: '2026-06-15', note: '' }
+    ],
+    expenses: [
+      { id: 1, amount: 24500, desc: 'Abonnement Internet Fibre', category: 'Factures', date: '2026-06-02', method: 'Mobile Money', note: 'Canalbox Calavi', receipt: null },
+      { id: 2, amount: 15000, desc: 'Carburant Mensuel', category: 'Transport', date: '2026-06-05', method: 'Espèces', note: '', receipt: null },
+      { id: 3, amount: 80000, desc: 'Loyer Bureau Cotonou', category: 'Factures', date: '2026-06-01', method: 'Virement Bancaire', note: 'Quote-part espace partagé', receipt: null },
+      { id: 4, amount: 12500, desc: 'Déjeuner Équipe', category: 'Alimentation', date: '2026-06-10', method: 'Espèces', note: 'Restaurant à Calavi', receipt: null }
+    ],
+    categories: [
+      { id: 1, name: 'Alimentation', type: 'expense', icon: 'restaurant', color: '#E53935' },
+      { id: 2, name: 'Transport', type: 'expense', icon: 'directions_car', color: '#1E88E5' },
+      { id: 3, name: 'Factures', type: 'expense', icon: 'bolt', color: '#FDD835' },
+      { id: 4, name: 'Shopping', type: 'expense', icon: 'shopping_cart', color: '#D81B60' },
+      { id: 5, name: 'Salaire', type: 'income', icon: 'work', color: '#43A047' },
+      { id: 6, name: 'Freelance', type: 'income', icon: 'attach_money', color: '#00897B' }
+    ],
+    budgets: [
+      { id: 1, category: 'Alimentation', amount: 60000, period: 'Mensuel', start: '2026-06-01', spent: 12500 },
+      { id: 2, category: 'Transport', amount: 40000, period: 'Mensuel', start: '2026-06-01', spent: 15000 },
+      { id: 3, category: 'Factures', amount: 150000, period: 'Mensuel', start: '2026-06-01', spent: 104500 }
+    ],
+    planning: [
+      { id: 1, title: 'Hébergement Serveur Cloud', amount: 18000, category: 'Factures', date: '2026-07-05', repeat: 'Chaque mois' },
+      { id: 2, title: 'Abonnement API Maps', amount: 35000, category: 'Transport', date: '2026-07-15', repeat: 'Chaque année' }
+    ],
+    savings: [
+      { id: 1, name: 'Nouvel Ordinateur Dev', target: 850000, current: 400000, date: '2026-12-31' },
+      { id: 2, name: 'Fonds de Secours Mind Tech', target: 1000000, current: 600000, date: '2026-10-01' }
+    ],
+    notifications: [
+      { id: 1, title: 'Seuil Budget Atteint', message: 'Vous avez consommé plus de 70% de votre budget Factures.', read: false, time: 'Il y a 2h' },
+      { id: 2, title: 'Objectif en vue !', message: 'Félicitations, votre épargne Projet Ordinateur progresse bien.', read: true, time: 'Il y a 1 jour' }
+    ]
+  };
+
+  // Raccourcis utilitaires pour alléger les manipulations du DOM
+  function $(id) { 
+    return document.getElementById(id); 
+  }
+
+  function showToast(msg) {
+    const toast = $('toast');
+    toast.textContent = msg;
+    toast.classList.add('show');
+    setTimeout(() => {
+      toast.classList.remove('show');
+    }, 2500);
+  }
+
+  function openDrawer() {
+    $('drawer').classList.add('open');
+    $('drawer-overlay').classList.add('show');
+  }
+
+  function closeDrawer() {
+    $('drawer').classList.remove('open');
+    $('drawer-overlay').classList.remove('show');
+  }
+
+  // Système de routage interne fluide entre les différents calques (écrans)
+  function navigateTo(screen) {
+    const bottomNavScreens = ['dashboard', 'statistics', 'planning', 'income-list', 'expenses-list'];
+    
+    if (bottomNavScreens.includes(screen)) {
+      $('bottom-nav').style.display = 'flex';
+    } else {
+      $('bottom-nav').style.display = 'none';
+    }
+
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    $('screen-' + screen).classList.add('active');
+    currentScreen = 'screen-' + screen;
+    window.scrollTo(0, 0);
+
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    
+    const indexMap = { 'dashboard': 0, 'income-list': 1, 'expenses-list': 2, 'planning': 3, 'statistics': 4 };
+    if (indexMap[screen] !== undefined) {
+      document.querySelectorAll('.nav-item')[indexMap[screen]].classList.add('active');
+    }
+
+    // Routage d'exécution de rafraîchissement des modules d'affichage
+    if (screen === 'dashboard') renderDashboard();
+    if (screen === 'income-list') renderIncome();
+    if (screen === 'expenses-list') renderExpenses();
+    if (screen === 'categories') renderCategories();
+    if (screen === 'budget-list') renderBudgets();
+    if (screen === 'planning') renderPlanning();
+    if (screen === 'savings') renderSavings();
+    if (screen === 'statistics') renderStatistics();
+    if (screen === 'notifications') renderNotifications();
+    if (screen === 'history') renderHistory();
+  }
+
+  // -- CONTRÔLEURS DE FLUX ET LOGIQUE D'INTERACTION --
+  let onboardingIndex = 0;
+  function nextOnboarding() {
+    onboardingIndex++;
+    const slides = $('onboarding-slides').children;
+    
+    for (let i = 0; i < slides.length; i++) {
+      slides[i].style.display = 'none';
+    }
+    
+    if (onboardingIndex >= slides.length) {
+      navigateTo('login');
+      return;
+    }
+    
+    slides[onboardingIndex].style.display = 'block';
+    document.querySelectorAll('#onboarding-dots .dot').forEach((d, i) => {
+      d.classList.toggle('active', i === onboardingIndex);
+    });
+    
+    $('onboarding-btn').textContent = (onboardingIndex === slides.length - 1) ? 'Commencer' : 'Suivant';
+  }
+
+  function login() {
+    const email = $('login-email').value;
+    const pass = $('login-password').value;
+    if (!email || !pass) {
+      showToast('Veuillez remplir tous les champs requis.');
+      return;
+    }
+    navigateTo('dashboard');
+    showToast('Ravi de vous revoir !');
+  }
+
+  function register() {
+    const name = $('reg-name').value;
+    const email = $('reg-email').value;
+    const password = $('reg-password').value;
+    const confirm = $('reg-confirm').value;
+
+    if (!name || !email || !password || !confirm) {
+      showToast('Tous les champs sont obligatoires.');
+      return;
+    }
+    if (password !== confirm) {
+      showToast('Les mots de passe ne correspondent pas.');
+      return;
+    }
+    navigateTo('login');
+    showToast('Votre compte a été créé avec succès. Connectez-vous.');
+  }
+
+  function sendOTP() {
+    if (!$('forgot-email').value) {
+      showToast('Veuillez entrer votre adresse email.');
+      return;
+    }
+    navigateTo('otp');
+    showToast('Code de validation envoyé par email.');
+  }
+
+  function verifyOTP() {
+    if ($('otp-code').value.length !== 6) {
+      showToast('Le code doit comporter 6 chiffres.');
+      return;
+    }
+    navigateTo('reset-password');
+  }
+
+  function resetPassword() {
+    const p1 = $('new-password').value;
+    const p2 = $('new-confirm').value;
+    if (!p1 || !p2) {
+      showToast('Veuillez renseigner les champs.');
+      return;
+    }
+    if (p1 !== p2) {
+      showToast('Les mots de passe saisis diffèrent.');
+      return;
+    }
+    navigateTo('login');
+    showToast('Votre mot de passe a été réinitialisé.');
+  }
+
+  function logout() {
+    navigateTo('login');
+    showToast('Déconnexion effectuée.');
+  }
+
+  // Formatage des prix conforme pour l'Afrique de l'Ouest (FCFA)
+  function fmt(amount) {
+    return parseFloat(amount).toLocaleString('fr-FR') + ' F CFA';
+  }
+
+  function today() {
+    return new Date().toISOString().split('T')[0];
+  }
+
+  // Moteur de rendu du tableau de bord d'accueil
+  function renderDashboard() {
+    const totalIncome = data.income.reduce((acc, i) => acc + i.amount, 0);
+    const totalExpense = data.expenses.reduce((acc, e) => acc + e.amount, 0);
+    
+    $('dash-balance').textContent = fmt(totalIncome - totalExpense);
+    $('dash-income').textContent = fmt(totalIncome);
+    $('dash-expense').textContent = fmt(totalExpense);
+
+    const recent = [...data.expenses].sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
+    $('dash-transactions').innerHTML = recent.map(t => {
+      const cat = data.categories.find(c => c.name === t.category) || { icon: 'category', color: '#999999' };
+      return `
+        <div class="list-item" onclick="viewExpense(${t.id})">
+          <div class="list-icon" style="background:${cat.color}22; color:${cat.color};">
+            <span class="material-icons">${cat.icon}</span>
+          </div>
+          <div class="list-info">
+            <h4>${t.desc}</h4>
+            <p>${t.category} &bull; ${t.date}</p>
+          </div>
+          <div class="list-amount expense">${fmt(t.amount)}</div>
+        </div>`;
+    }).join('');
+
+    $('dash-budgets').innerHTML = data.budgets.map(b => {
+      const pct = Math.min(100, Math.round((b.spent / b.amount) * 100));
+      let color = 'var(--success)';
+      if (pct > 75) color = 'var(--warning)';
+      if (pct > 90) color = 'var(--danger)';
+      return `
+        <div style="margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; font-size:13px; margin-bottom:4px;">
+            <span>${b.category}</span>
+            <span>${pct}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pct}%; background:${color};"></div>
+          </div>
+        </div>`;
+    }).join('');
+
+    const upcoming = data.planning.filter(p => new Date(p.date) >= new Date()).sort((a, b) => new Date(a.date) - new Date(b.date)).slice(0, 3);
+    $('dash-upcoming').innerHTML = upcoming.length ? upcoming.map(p => `
+      <div class="list-item">
+        <span class="material-icons" style="color:var(--warning);">event</span>
+        <div class="list-info">
+          <h4>${p.title}</h4>
+          <p>${p.date} &bull; ${p.repeat}</p>
+        </div>
+        <div class="list-amount">${fmt(p.amount)}</div>
+      </div>`).join('') : '<p style="color:var(--text-secondary); font-size:14px;">Aucune opération planifiée</p>';
+
+    renderDoughnut();
+  }
+
+  // Rendu Canvas fait main du Donut de dépenses
+  function renderDoughnut() {
+    const canvas = $('expenseChart');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    const cats = {};
+    data.expenses.forEach(e => { 
+      cats[e.category] = (cats[e.category] || 0) + e.amount; 
+    });
+    
+    const labels = Object.keys(cats);
+    const values = Object.values(cats);
+    const total = values.reduce((a, b) => a + b, 0);
+    const palette = ['#E53935', '#1E88E5', '#FDD835', '#43A047', '#D81B60', '#00897B', '#FB8C00', '#5E35B1'];
+    
+    ctx.clearRect(0, 0, 300, 200);
+    let startAngle = 0;
+    const cx = 100, cy = 100, r = 70, innerRadius = 45;
+    
+    labels.forEach((l, i) => {
+      const sliceAngle = (values[i] / total) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.arc(cx, cy, r, startAngle, startAngle + sliceAngle);
+      ctx.closePath();
+      ctx.fillStyle = palette[i % palette.length];
+      ctx.fill();
+      startAngle += sliceAngle;
+    });
+    
+    // Création de l'espace vide central du Donut
+    ctx.beginPath();
+    ctx.arc(cx, cy, innerRadius, 0, Math.PI * 2);
+    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--surface') || '#FFFFFF';
+    ctx.fill();
+    
+    // Légende latérale explicative
+    let legendY = 30;
+    labels.forEach((l, i) => {
+      ctx.fillStyle = palette[i % palette.length];
+      ctx.fillRect(210, legendY, 12, 12);
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text');
+      ctx.font = '12px sans-serif';
+      ctx.fillText(Math.round((values[i] / total) * 100) + '% ' + l, 228, legendY + 10);
+      legendY += 22;
+    });
+  }
+
+  // Gestion opérationnelle des flux de Revenus
+  function renderIncome() {
+    const query = $('income-search').value.toLowerCase();
+    const filtered = data.income.filter(i => i.desc.toLowerCase().includes(query) || i.category.toLowerCase().includes(query)).sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    $('income-list').innerHTML = filtered.length ? filtered.map(i => {
+      const cat = data.categories.find(c => c.name === i.category) || { icon: 'category', color: '#999999' };
+      return `
+        <div class="list-item" onclick="viewIncome(${i.id})">
+          <div class="list-icon" style="background:${cat.color}22; color:${cat.color};">
+            <span class="material-icons">${cat.icon}</span>
+          </div>
+          <div class="list-info">
+            <h4>${i.desc}</h4>
+            <p>${i.category} &bull; ${i.date}</p>
+          </div>
+          <div class="list-amount income">${fmt(i.amount)}</div>
+        </div>`;
+    }).join('') : '<div class="empty-state"><span class="material-icons">trending_up</span><p>Aucun flux de revenu trouvé</p></div>';
+  }
+
+  function populateCategorySelect(id, type) {
+    const select = $(id);
+    if (!select) return;
+    select.innerHTML = '<option value="">Choisir la catégorie</option>' + 
+      data.categories.filter(c => c.type === type).map(c => `<option value="${c.name}">${c.name}</option>`).join('');
+  }
+
+  function saveIncome() {
+    const amount = parseFloat($('inc-amount').value);
+    const desc = $('inc-desc').value;
+    const cat = $('inc-category').value;
+    const date = $('inc-date').value;
+    const note = $('inc-note').value;
+
+    if (!amount || !desc || !cat || !date) {
+      showToast('Veuillez remplir les informations requises.');
+      return;
+    }
+
+    if (editingType === 'income') {
+      const match = data.income.find(x => x.id === editingId);
+      if (match) {
+        match.amount = amount; match.desc = desc; match.category = cat; match.date = date; match.note = note;
+      }
+      showToast('Revenu mis à jour.');
+    } else {
+      data.income.push({ id: Date.now(), amount, desc, category: cat, date, note });
+      showToast('Nouveau revenu ajouté.');
+    }
+
+    editingId = null; editingType = null;
+    $('income-form-title').textContent = 'Ajouter un revenu';
+    navigateTo('income-list');
+  }
+
+  function viewIncome(id) {
+    const inc = data.income.find(x => x.id === id);
+    if (!inc) return;
+    const cat = data.categories.find(c => c.name === inc.category) || { icon: 'category', color: '#999999' };
+    
+    $('income-detail-content').innerHTML = `
+      <div style="text-align:center; margin-bottom:24px;">
+        <div class="list-icon" style="margin:0 auto; width:72px; height:72px; font-size:36px; background:${cat.color}22; color:${cat.color};">
+          <span class="material-icons">${cat.icon}</span>
+        </div>
+        <h2 style="margin-top:16px; font-size:28px;" class="income">${fmt(inc.amount)}</h2>
+        <p style="color:var(--text-secondary);">${inc.desc}</p>
+      </div>
+      <div class="card">
+        <div class="list-item"><span class="material-icons" style="color:var(--primary);">category</span><div class="list-info"><h4>Catégorie</h4><p>${inc.category}</p></div></div>
+        <div class="list-item"><span class="material-icons" style="color:var(--primary);">calendar_today</span><div class="list-info"><h4>Date de perception</h4><p>${inc.date}</p></div></div>
+        <div class="list-item"><span class="material-icons" style="color:var(--primary);">notes</span><div class="list-info"><h4>Notes</h4><p>${inc.note || 'Aucune note'}</p></div></div>
+      </div>
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button class="btn btn-primary btn-block" onclick="editIncome(${inc.id})">Modifier</button>
+        <button class="btn btn-danger btn-block" onclick="confirmDelete('income', ${inc.id})">Supprimer</button>
+      </div>`;
+    navigateTo('income-detail');
+  }
+
+  function editIncome(id) {
+    const inc = data.income.find(x => x.id === id);
+    if (!inc) return;
+    editingId = id; editingType = 'income';
+    $('income-form-title').textContent = 'Modifier le revenu';
+    $('inc-amount').value = inc.amount;
+    $('inc-desc').value = inc.desc;
+    populateCategorySelect('inc-category', 'income');
+    $('inc-category').value = inc.category;
+    $('inc-date').value = inc.date;
+    $('inc-note').value = inc.note || '';
+    navigateTo('income-add');
+  }
+
+  // Traitement opérationnel de l'interface des Dépenses
+  function renderExpenses() {
+    const query = $('expense-search').value.toLowerCase();
+    let filtered = data.expenses.filter(e => e.desc.toLowerCase().includes(query) || e.category.toLowerCase().includes(query));
+    
+    if (expenseFilter !== 'all') {
+      filtered = filtered.filter(e => e.category === expenseFilter);
+    }
+    
+    filtered.sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    $('expense-list').innerHTML = filtered.length ? filtered.map(e => {
+      const cat = data.categories.find(c => c.name === e.category) || { icon: 'category', color: '#999999' };
+      return `
+        <div class="list-item" onclick="viewExpense(${e.id})">
+          <div class="list-icon" style="background:${cat.color}22; color:${cat.color};">
+            <span class="material-icons">${cat.icon}</span>
+          </div>
+          <div class="list-info">
+            <h4>${e.desc}</h4>
+            <p>${e.category} &bull; ${e.date}</p>
+          </div>
+          <div class="list-amount expense">${fmt(e.amount)}</div>
+        </div>`;
+    }).join('') : '<div class="empty-state"><span class="material-icons">receipt_long</span><p>Aucune dépense enregistrée</p></div>';
+  }
+
+  function filterExpenses(cat, btn) {
+    expenseFilter = cat;
+    document.querySelectorAll('#screen-expenses-list .tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderExpenses();
+  }
+
+  function saveExpense() {
+    const amount = parseFloat($('exp-amount').value);
+    const desc = $('exp-desc').value;
+    const cat = $('exp-category').value;
+    const date = $('exp-date').value;
+    const method = $('exp-method').value;
+    const note = $('exp-note').value;
+
+    if (!amount || !desc || !cat || !date) {
+      showToast('Veuillez remplir les critères obligatoires.');
+      return;
+    }
+
+    if (editingType === 'expense') {
+      const match = data.expenses.find(x => x.id === editingId);
+      if (match) {
+        match.amount = amount; match.desc = desc; match.category = cat; match.date = date; match.method = method; match.note = note;
+      }
+      showToast('Dépense mise à jour.');
+    } else {
+      data.expenses.push({ id: Date.now(), amount, desc, category: cat, date, method, note, receipt: null });
+      showToast('Dépense enregistrée.');
+    }
+
+    editingId = null; editingType = null;
+    $('expense-form-title').textContent = 'Ajouter une dépense';
+    navigateTo('expenses-list');
+  }
+
+  function viewExpense(id) {
+    const exp = data.expenses.find(x => x.id === id);
+    if (!exp) return;
+    const cat = data.categories.find(c => c.name === exp.category) || { icon: 'category', color: '#999999' };
+    
+    $('expense-detail-content').innerHTML = `
+      <div style="text-align:center; margin-bottom:24px;">
+        <div class="list-icon" style="margin:0 auto; width:72px; height:72px; font-size:36px; background:${cat.color}22; color:${cat.color};">
+          <span class="material-icons">${cat.icon}</span>
+        </div>
+        <h2 style="margin-top:16px; font-size:28px;" class="expense">${fmt(exp.amount)}</h2>
+        <p style="color:var(--text-secondary);">${exp.desc}</p>
+      </div>
+      <div class="card">
+        <div class="list-item"><span class="material-icons" style="color:var(--primary);">category</span><div class="list-info"><h4>Catégorie</h4><p>${exp.category}</p></div></div>
+        <div class="list-item"><span class="material-icons" style="color:var(--primary);">calendar_today</span><div class="list-info"><h4>Date de paiement</h4><p>${exp.date}</p></div></div>
+        <div class="list-item"><span class="material-icons" style="color:var(--primary);">payment</span><div class="list-info"><h4>Règlement</h4><p>${exp.method}</p></div></div>
+        <div class="list-item"><span class="material-icons" style="color:var(--primary);">notes</span><div class="list-info"><h4>Notes</h4><p>${exp.note || 'Aucun complément'}</p></div></div>
+        ${exp.receipt ? `<div class="list-item"><span class="material-icons" style="color:var(--primary);">receipt</span><div class="list-info"><h4>Facture numérisée</h4></div></div><img src="${exp.receipt}" style="width:100%; border-radius:12px; margin-top:8px;">` : ''}
+      </div>
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button class="btn btn-primary btn-block" onclick="editExpense(${exp.id})">Modifier</button>
+        <button class="btn btn-danger btn-block" onclick="confirmDelete('expense', ${exp.id})">Supprimer</button>
+      </div>`;
+    navigateTo('expense-detail');
+  }
+
+  function editExpense(id) {
+    const exp = data.expenses.find(x => x.id === id);
+    if (!exp) return;
+    editingId = id; editingType = 'expense';
+    $('expense-form-title').textContent = 'Modifier la dépense';
+    $('exp-amount').value = exp.amount;
+    $('exp-desc').value = exp.desc;
+    populateCategorySelect('exp-category', 'expense');
+    $('exp-category').value = exp.category;
+    $('exp-date').value = exp.date;
+    $('exp-method').value = exp.method;
+    $('exp-note').value = exp.note || '';
+    navigateTo('expense-add');
+  }
+
+  // Modale générique pour la confirmation des suppressions
+  function confirmDelete(type, id) {
+    $('modal-title').textContent = 'Confirmation de suppression';
+    $('modal-body').textContent = `Êtes-vous sûr de vouloir supprimer cet élément (${type}) ?`;
+    $('modal-btns').innerHTML = `
+      <button class="btn btn-outline" onclick="closeModal()">Annuler</button>
+      <button class="btn btn-danger" onclick="doDelete('${type}', ${id})">Supprimer</button>`;
+    $('modal-overlay').classList.add('show');
+  }
+
+  function closeModal() {
+    $('modal-overlay').classList.remove('show');
+  }
+
+  function doDelete(type, id) {
+    if (type === 'income') data.income = data.income.filter(x => x.id !== id);
+    else if (type === 'expense') data.expenses = data.expenses.filter(x => x.id !== id);
+    else if (type === 'category') data.categories = data.categories.filter(x => x.id !== id);
+    else if (type === 'budget') data.budgets = data.budgets.filter(x => x.id !== id);
+    else if (type === 'planning') data.planning = data.planning.filter(x => x.id !== id);
+    else if (type === 'savings') data.savings = data.savings.filter(x => x.id !== id);
+    
+    closeModal();
+    showToast('Élément supprimé de la base.');
+    
+    if (type === 'income') { navigateTo('income-list'); renderIncome(); }
+    if (type === 'expense') { navigateTo('expenses-list'); renderExpenses(); }
+    if (type === 'category') renderCategories();
+    if (type === 'budget') renderBudgets();
+    if (type === 'planning') renderPlanning();
+    if (type === 'savings') renderSavings();
+  }
+
+  function switchCatTab(tab, btn) {
+    catTab = tab;
+    document.querySelectorAll('#screen-categories .tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderCategories();
+  }
+
+  function renderCategories() {
+    const subset = data.categories.filter(c => c.type === catTab);
+    $('category-list').innerHTML = subset.length ? subset.map(c => `
+      <div class="list-item">
+        <div class="list-icon" style="background:${c.color}22; color:${c.color};">
+          <span class="material-icons">${c.icon}</span>
+        </div>
+        <div class="list-info">
+          <h4>${c.name}</h4>
+          <p>${c.type === 'expense' ? 'Poste de dépense' : 'Entrée financière'}</p>
+        </div>
+        <div style="display:flex; gap:8px;">
+          <button class="icon-btn" onclick="editCategory(${c.id})"><span class="material-icons">edit</span></button>
+          <button class="icon-btn" onclick="confirmDelete('category', ${c.id})"><span class="material-icons">delete</span></button>
+        </div>
+      </div>`).join('') : '<div class="empty-state"><span class="material-icons">category</span><p>Aucune catégorie configurée</p></div>';
+  }
+
+  function renderIconGrid() {
+    $('cat-icon-grid').innerHTML = icons.map(ic => `
+      <div style="width:40px; height:40px; display:flex; align-items:center; justify-content:center; border-radius:8px; cursor:pointer; border:2px solid ${$('cat-selected-icon').value === ic ? 'var(--primary)' : 'transparent'};" onclick="selectCatIcon('${ic}', this)">
+        <span class="material-icons">${ic}</span>
+      </div>`).join('');
+  }
+
+  function renderColorGrid() {
+    $('cat-color-grid').innerHTML = colors.map(co => `
+      <div style="width:40px; height:40px; border-radius:8px; cursor:pointer; background:${co}; border:3px solid ${$('cat-selected-color').value === co ? 'var(--text)' : 'transparent'};" onclick="selectCatColor('${co}', this)">
+      </div>`).join('');
+  }
+
+  function selectCatIcon(ic, el) { $('cat-selected-icon').value = ic; renderIconGrid(); }
+  function selectCatColor(co, el) { $('cat-selected-color').value = co; renderColorGrid(); }
+
+  function saveCategory() {
+    const name = $('cat-name').value;
+    const type = $('cat-type').value;
+    const icon = $('cat-selected-icon').value;
+    const color = $('cat-selected-color').value;
+
+    if (!name) { showToast('Veuillez spécifier le nom de la catégorie.'); return; }
+
+    if (editingType === 'category') {
+      const match = data.categories.find(x => x.id === editingId);
+      if (match) { match.name = name; match.type = type; match.icon = icon; match.color = color; }
+      showToast('Catégorie ajustée.');
+    } else {
+      data.categories.push({ id: Date.now(), name, type, icon, color });
+      showToast('Nouvelle catégorie enregistrée.');
+    }
+
+    editingId = null; editingType = null;
+    $('cat-form-title').textContent = 'Créer une catégorie';
+    navigateTo('categories');
+  }
+
+  function editCategory(id) {
+    const cat = data.categories.find(x => x.id === id);
+    if (!cat) return;
+    editingId = id; editingType = 'category';
+    $('cat-form-title').textContent = 'Ajuster la catégorie';
+    $('cat-name').value = cat.name;
+    $('cat-type').value = cat.type;
+    $('cat-selected-icon').value = cat.icon;
+    $('cat-selected-color').value = cat.color;
+    renderIconGrid(); renderColorGrid();
+    navigateTo('category-add');
+  }
+
+  // Budgets
+  function renderBudgets() {
+    $('budget-list').innerHTML = data.budgets.length ? data.budgets.map(b => {
+      const pct = Math.min(100, Math.round((b.spent / b.amount) * 100));
+      const badgeStyle = pct > 90 ? 'badge-danger' : pct > 75 ? 'badge-warning' : 'badge-success';
+      let barColor = 'var(--success)';
+      if (pct > 75) barColor = 'var(--warning)';
+      if (pct > 90) barColor = 'var(--danger)';
+
+      return `
+        <div class="card" onclick="viewBudget(${b.id})">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h4>${b.category}</h4>
+            <span class="badge ${badgeStyle}">${pct}%</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text-secondary); margin-bottom:6px;">
+            <span>Consommé : ${fmt(b.spent)}</span>
+            <span>Limite : ${fmt(b.amount)}</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pct}%; background:${barColor};"></div>
+          </div>
+        </div>`;
+    }).join('') : '<div class="empty-state"><span class="material-icons">account_balance_wallet</span><p>Aucun budget de crise défini</p></div>';
+  }
+
+  function saveBudget() {
+    const cat = $('bud-category').value;
+    const amount = parseFloat($('bud-amount').value);
+    const period = $('bud-period').value;
+    const start = $('bud-start').value;
+
+    if (!cat || !amount || !start) { showToast('Veuillez compléter le formulaire.'); return; }
+
+    if (editingType === 'budget') {
+      const match = data.budgets.find(x => x.id === editingId);
+      if (match) { match.category = cat; match.amount = amount; match.period = period; match.start = start; }
+      showToast('Budget réajusté.');
+    } else {
+      data.budgets.push({ id: Date.now(), category: cat, amount, period, start, spent: 0 });
+      showToast('Budget alloué créé.');
+    }
+
+    editingId = null; editingType = null;
+    $('budget-form-title').textContent = 'Allouer un budget';
+    navigateTo('budget-list');
+  }
+
+  function viewBudget(id) {
+    const b = data.budgets.find(x => x.id === id);
+    if (!b) return;
+    const pct = Math.min(100, Math.round((b.spent / b.amount) * 100));
+    let color = 'var(--success)';
+    if (pct > 75) color = 'var(--warning)';
+    if (pct > 90) color = 'var(--danger)';
+
+    $('budget-detail-content').innerHTML = `
+      <div style="text-align:center; margin-bottom:24px;">
+        <h2 style="font-size:32px;">${b.category}</h2>
+        <p style="color:var(--text-secondary);">Enveloppe ${b.period}</p>
+      </div>
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+          <span>Niveau d'utilisation</span>
+          <span style="font-weight:700; color:${color};">${pct}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${pct}%; background:${color};"></div>
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="stat-card"><h3>Plafond</h3><div class="amount">${fmt(b.amount)}</div></div>
+          <div class="stat-card"><h3>Utilisé</h3><div class="amount expense">${fmt(b.spent)}</div></div>
+        </div>
+        <div class="stat-card" style="margin-top:12px;">
+          <h3>Solde de sécurité disponible</h3>
+          <div class="amount income">${fmt(Math.max(0, b.amount - b.spent))}</div>
+        </div>
+      </div>
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button class="btn btn-primary btn-block" onclick="editBudget(${b.id})">Modifier</button>
+        <button class="btn btn-danger btn-block" onclick="confirmDelete('budget', ${b.id})">Supprimer</button>
+      </div>`;
+    navigateTo('budget-detail');
+  }
+
+  function editBudget(id) {
+    const b = data.budgets.find(x => x.id === id);
+    if (!b) return;
+    editingId = id; editingType = 'budget';
+    $('budget-form-title').textContent = 'Modifier le budget';
+    populateCategorySelect('bud-category', 'expense');
+    $('bud-category').value = b.category;
+    $('bud-amount').value = b.amount;
+    $('bud-period').value = b.period;
+    $('bud-start').value = b.start;
+    navigateTo('budget-add');
+  }
+
+  // Calendrier et Planification
+  function renderPlanning() {
+    renderCalendar();
+    const sorted = data.planning.sort((a, b) => new Date(a.date) - new Date(b.date));
+    
+    $('planning-list').innerHTML = sorted.length ? sorted.map(p => {
+      const cat = data.categories.find(c => c.name === p.category) || { icon: 'event', color: '#999999' };
+      return `
+        <div class="card">
+          <div class="list-item">
+            <div class="list-icon" style="background:${cat.color}22; color:${cat.color};">
+              <span class="material-icons">${cat.icon}</span>
+            </div>
+            <div class="list-info">
+              <h4>${p.title}</h4>
+              <p>Échéance : ${p.date} &bull; Recorrence : ${p.repeat}</p>
+            </div>
+            <div class="list-amount">${fmt(p.amount)}</div>
+          </div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn btn-outline" style="padding:8px 14px; font-size:13px; flex:1;" onclick="convertToExpense(${p.id})">Marquer comme payé</button>
+            <button class="icon-btn" onclick="confirmDelete('planning', ${p.id})"><span class="material-icons">delete</span></button>
+          </div>
+        </div>`;
+    }).join('') : '<div class="empty-state"><span class="material-icons">event</span><p>Aucune charge prévue ce mois</p></div>';
+  }
+
+  function renderCalendar() {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    $('cal-month').textContent = currentMonth.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+    
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+    
+    let gridHtml = '';
+    // Décalage pour le premier jour de la semaine
+    for (let i = 0; i < firstDayIndex; i++) {
+      gridHtml += '<div></div>';
+    }
+    
+    for (let day = 1; day <= totalDays; day++) {
+      const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const hasEvent = data.planning.some(p => p.date === dateStr);
+      const isToday = dateStr === today();
+      
+      gridHtml += `<div class="calendar-day ${isToday ? 'today' : ''} ${hasEvent ? 'has-event' : ''}">${day}</div>`;
+    }
+    $('cal-grid').innerHTML = gridHtml;
+  }
+
+  function changeMonth(direction) {
+    currentMonth.setMonth(currentMonth.getMonth() + direction);
+    renderPlanning();
+  }
+
+  function savePlanning() {
+    const title = $('plan-title').value;
+    const amount = parseFloat($('plan-amount').value);
+    const cat = $('plan-category').value;
+    const date = $('plan-date').value;
+    const repeat = $('plan-repeat').value;
+
+    if (!title || !amount || !cat || !date) { showToast('Remplissez les champs requis.'); return; }
+
+    if (editingType === 'planning') {
+      const match = data.planning.find(x => x.id === editingId);
+      if (match) { match.title = title; match.amount = amount; match.category = cat; match.date = date; match.repeat = repeat; }
+      showToast('Prévision modifiée.');
+    } else {
+      data.planning.push({ id: Date.now(), title, amount, category: cat, date, repeat });
+      showToast('Échéance ajoutée.');
+    }
+
+    editingId = null; editingType = null;
+    $('plan-form-title').textContent = 'Prévoir une échéance';
+    navigateTo('planning');
+  }
+
+  function convertToExpense(id) {
+    const item = data.planning.find(x => x.id === id);
+    if (!item) return;
+    
+    data.expenses.push({
+      id: Date.now(),
+      amount: item.amount,
+      desc: item.title,
+      category: item.category,
+      date: item.date || today(),
+      method: 'Mobile Money',
+      note: 'Généré via planification automatique',
+      receipt: null
+    });
+    
+    showToast('Facture basculée dans vos dépenses réelles.');
+    renderPlanning();
+    renderDashboard();
+  }
+
+  // Objectifs d'Épargne & Célébration
+  function renderSavings() {
+    $('savings-list').innerHTML = data.savings.length ? data.savings.map(s => {
+      const pct = Math.min(100, Math.round((s.current / s.target) * 100));
+      return `
+        <div class="card" onclick="viewSavings(${s.id})">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <h4>${s.name}</h4>
+            <span class="badge ${pct >= 100 ? 'badge-success' : 'badge-warning'}">${pct}%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width:${pct}%; background:${pct >= 100 ? 'var(--success)' : 'var(--primary)'};"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; font-size:13px; color:var(--text-secondary); margin-top:8px;">
+            <span>Épargné : ${fmt(s.current)}</span>
+            <span>Objectif : ${fmt(s.target)}</span>
+          </div>
+        </div>`;
+    }).join('') : '<div class="empty-state"><span class="material-icons">savings</span><p>Aucun projet d\'épargne en cours</p></div>';
+  }
+
+  function saveSavings() {
+    const name = $('save-name').value;
+    const target = parseFloat($('save-target').value);
+    const current = parseFloat($('save-current').value) || 0;
+    const date = $('save-date').value;
+
+    if (!name || !target) { showToast('Veuillez compléter les indicateurs indispensables.'); return; }
+
+    if (editingType === 'savings') {
+      const match = data.savings.find(x => x.id === editingId);
+      if (match) { match.name = name; match.target = target; match.current = current; match.date = date; }
+      showToast('Objectif ajusté.');
+    } else {
+      data.savings.push({ id: Date.now(), name, target, current, date });
+      showToast('Nouvel objectif de vie configuré !');
+    }
+
+    editingId = null; editingType = null;
+    $('savings-form-title').textContent = 'Créer un objectif';
+    navigateTo('savings');
+  }
+
+  function viewSavings(id) {
+    const s = data.savings.find(x => x.id === id);
+    if (!s) return;
+    const pct = Math.min(100, Math.round((s.current / s.target) * 100));
+    
+    $('savings-detail-content').innerHTML = `
+      <div style="text-align:center; margin-bottom:24px;">
+        <span class="material-icons" style="font-size:64px; color:var(--primary);">savings</span>
+        <h2 style="margin-top:12px;">${s.name}</h2>
+        <p style="color:var(--text-secondary);">Cible finale : ${fmt(s.target)}</p>
+      </div>
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; margin-bottom:12px;">
+          <span>État d'avancement</span>
+          <span style="font-weight:700;">${pct}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" style="width:${pct}%; background:${pct >= 100 ? 'var(--success)' : 'var(--primary)'};"></div>
+        </div>
+        <div class="grid-2" style="margin-top:16px;">
+          <div class="stat-card"><h3>Mis de côté</h3><div class="amount income">${fmt(s.current)}</div></div>
+          <div class="stat-card"><h3>Reste à pourvoir</h3><div class="amount">${fmt(Math.max(0, s.target - s.current))}</div></div>
+        </div>
+      </div>
+      <div class="card">
+        <h4 style="margin-bottom:12px;">Alimenter cette cagnotte</h4>
+        <input class="input" type="number" id="add-goal-amount" placeholder="Montant à rajouter">
+        <button class="btn btn-primary btn-block" onclick="addToGoal(${s.id})" style="margin-top:8px;">Injecter les fonds</button>
+      </div>
+      <div style="display:flex; gap:12px; margin-top:16px;">
+        <button class="btn btn-primary btn-block" onclick="editSavings(${s.id})">Modifier</button>
+        <button class="btn btn-danger btn-block" onclick="confirmDelete('savings', ${s.id})">Supprimer l'objectif</button>
+      </div>`;
+    navigateTo('savings-detail');
+  }
+
+  function addToGoal(id) {
+    const amount = parseFloat($('add-goal-amount').value);
+    if (!amount) { showToast('Veuillez spécifier le montant à allouer.'); return; }
+    
+    const goal = data.savings.find(x => x.id === id);
+    if (!goal) return;
+    
+    goal.current += amount;
+    
+    if (goal.current >= goal.target) {
+      goal.current = goal.target;
+      triggerCelebration();
+      showToast('Bravo ! Vous avez atteint votre objectif ! 🎉');
+    } else {
+      showToast('Cagnotte mise à jour avec succès.');
+    }
+    
+    viewSavings(id);
+    renderSavings();
+  }
+
+  // Animation visuelle de confettis pour féliciter l'utilisateur
+  function triggerCelebration() {
+    const area = $('confetti');
+    area.innerHTML = '';
+    for (let i = 0; i < 60; i++) {
+      const fragment = document.createElement('div');
+      fragment.className = 'confetti-piece';
+      fragment.style.left = Math.random() * 100 + '%';
+      fragment.style.background = colors[Math.floor(Math.random() * colors.length)];
+      fragment.style.animationDuration = (1.2 + Math.random()) + 's';
+      fragment.style.width = (6 + Math.random() * 8) + 'px';
+      fragment.style.height = fragment.style.width;
+      area.appendChild(fragment);
+    }
+    setTimeout(() => { area.innerHTML = ''; }, 3000);
+  }
+
+  function editSavings(id) {
+    const s = data.savings.find(x => x.id === id);
+    if (!s) return;
+    editingId = id; editingType = 'savings';
+    $('savings-form-title').textContent = 'Ajuster le projet';
+    $('save-name').value = s.name;
+    $('save-target').value = s.target;
+    $('save-current').value = s.current;
+    $('save-date').value = s.date || '';
+    navigateTo('savings-add');
+  }
+
+  // Analyses statistiques et graphiques Canvas
+  function switchStatPeriod(period, btn) {
+    statPeriod = period;
+    document.querySelectorAll('#screen-statistics .tab').forEach(t => t.classList.remove('active'));
+    btn.classList.add('active');
+    renderStatistics();
+  }
+
+  function renderStatistics() {
+    const totalIncome = data.income.reduce((acc, i) => acc + i.amount, 0);
+    const totalExpense = data.expenses.reduce((acc, e) => acc + e.amount, 0);
+    $('stat-income').textContent = fmt(totalIncome);
+    $('stat-expense').textContent = fmt(totalExpense);
+    
+    renderBarChart();
+    renderPieChart();
+    renderLineChart();
+  }
+
+  function renderBarChart() {
+    const canvas = $('barChart'); if (!canvas) return;
+    const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, 300, 200);
+    
+    const income = data.income.reduce((s, i) => s + i.amount, 0);
+    const expense = data.expenses.reduce((s, e) => s + e.amount, 0);
+    const max = Math.max(income, expense) || 1;
+    
+    ctx.fillStyle = 'var(--success)'; ctx.fillRect(40, 200 - (income / max) * 160, 80, (income / max) * 160);
+    ctx.fillStyle = 'var(--danger)'; ctx.fillRect(180, 200 - (expense / max) * 160, 80, (expense / max) * 160);
+    
+    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text'); ctx.font = '12px sans-serif';
+    ctx.fillText('Entrées', 55, 195); ctx.fillText('Sorties', 195, 195);
+  }
+
+  function renderPieChart() {
+    const canvas = $('pieChart'); if (!canvas) return;
+    const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, 300, 200);
+    
+    const cats = {}; data.expenses.forEach(e => { cats[e.category] = (cats[e.category] || 0) + e.amount; });
+    const labels = Object.keys(cats); const values = Object.values(cats);
+    const total = values.reduce((a, b) => a + b, 0);
+    const palette = ['#E53935', '#1E88E5', '#FDD835', '#43A047', '#D81B60', '#00897B', '#FB8C00', '#5E35B1'];
+    
+    let currentAngle = 0; const cx = 80, cy = 100, r = 60;
+    labels.forEach((l, i) => {
+      const angle = (values[i] / total) * Math.PI * 2;
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.arc(cx, cy, r, currentAngle, currentAngle + angle); ctx.closePath();
+      ctx.fillStyle = palette[i % palette.length]; ctx.fill(); currentAngle += angle;
+    });
+    
+    let itemY = 40;
+    labels.forEach((l, i) => {
+      ctx.fillStyle = palette[i % palette.length]; ctx.fillRect(170, itemY, 12, 12);
+      ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text'); ctx.font = '12px sans-serif';
+      ctx.fillText(l, 188, itemY + 10); itemY += 22;
+    });
+  }
+
+  function renderLineChart() {
+    const canvas = $('lineChart'); if (!canvas) return;
+    const ctx = canvas.getContext('2d'); ctx.clearRect(0, 0, 300, 200);
+    
+    const months = ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin'];
+    const mockIncomes = [200000, 350000, 300000, 480000, 520000, 600000];
+    const mockExpenses = [150000, 220000, 180000, 310000, 400000, 120000];
+    const maxVal = 700000;
+    
+    ctx.strokeStyle = 'var(--success)'; ctx.lineWidth = 2; ctx.beginPath();
+    months.forEach((m, i) => {
+      const x = 30 + i * 45; const y = 180 - (mockIncomes[i] / maxVal) * 150;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    
+    ctx.strokeStyle = 'var(--danger)'; ctx.beginPath();
+    months.forEach((m, i) => {
+      const x = 30 + i * 45; const y = 180 - (mockExpenses[i] / maxVal) * 150;
+      if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    });
+    ctx.stroke();
+    
+    ctx.fillStyle = getComputedStyle(document.body).getPropertyValue('--text'); ctx.font = '11px sans-serif';
+    months.forEach((m, i) => ctx.fillText(m, 25 + i * 45, 195));
+  }
+
+  // Écran de messagerie interne et notifications
+  function renderNotifications() {
+    $('notification-list').innerHTML = data.notifications.length ? data.notifications.map(n => `
+      <div class="list-item" style="opacity:${n.read ? 0.6 : 1};">
+        <span class="material-icons" style="color:${n.read ? 'var(--text-secondary)' : 'var(--primary)'};">
+          ${n.read ? 'notifications_none' : 'notifications'}
+        </span>
+        <div class="list-info">
+          <h4>${n.title}</h4>
+          <p>${n.message}</p>
+          <p style="font-size:12px; margin-top:2px;">${n.time}</p>
+        </div>
+        ${!n.read ? '<span class="material-icons" style="color:var(--primary); font-size:12px;">fiber_manual_record</span>' : ''}
+      </div>`).join('') : '<div class="empty-state"><span class="material-icons">notifications_none</span><p>Aucune nouvelle alerte</p></div>';
+  }
+
+  function markAllRead() {
+    data.notifications.forEach(n => n.read = true);
+    renderNotifications();
+    showToast('Toutes les notifications sont marquées comme lues.');
+  }
+
+  // Historique unifié des opérations
+  function renderHistory() {
+    const query = $('hist-search').value.toLowerCase();
+    const records = [
+      ...data.income.map(i => ({ ...i, flowType: 'income' })),
+      ...data.expenses.map(e => ({ ...e, flowType: 'expense' }))
+    ].sort((a, b) => new Date(b.date) - new Date(a.date));
+    
+    const filtered = records.filter(t => t.desc.toLowerCase().includes(query) || t.category.toLowerCase().includes(query));
+    
+    $('history-list').innerHTML = filtered.length ? filtered.map(t => {
+      const cat = data.categories.find(c => c.name === t.category) || { icon: 'category', color: '#999999' };
+      return `
+        <div class="list-item">
+          <div class="list-icon" style="background:${cat.color}22; color:${cat.color};">
+            <span class="material-icons">${cat.icon}</span>
+          </div>
+          <div class="list-info">
+            <h4>${t.desc}</h4>
+            <p>${t.flowType === 'income' ? 'Revenu' : 'Dépense'} &bull; ${t.category} &bull; ${t.date}</p>
+          </div>
+          <div class="list-amount ${t.flowType}">${fmt(t.amount)}</div>
+        </div>`;
+    }).join('') : '<div class="empty-state"><span class="material-icons">history</span><p>Aucune écriture trouvée</p></div>';
+  }
+
+  function toggleDark() {
+    darkMode = !darkMode;
+    document.body.setAttribute('data-theme', darkMode ? 'dark' : '');
+    $('darkToggle').classList.toggle('on');
+    renderDashboard();
+    renderStatistics();
+  }
+
+  // Modale rapide de création d'opérations (Bouton d'action flottant)
+  function showAddOptions() {
+    $('modal-title').textContent = 'Création rapide';
+    $('modal-body').textContent = 'Quelle opération désirez-vous ajouter ?';
+    $('modal-btns').innerHTML = `
+      <button class="btn btn-primary" onclick="closeModal(); navigateTo('income-add')">Revenu</button>
+      <button class="btn btn-danger" onclick="closeModal(); navigateTo('expense-add')">Dépense</button>
+      <button class="btn btn-outline" onclick="closeModal(); navigateTo('planning-add')">Échéance</button>`;
+    $('modal-overlay').classList.add('show');
+  }
+
+  function saveProfile() {
+    showToast('Modifications du profil appliquées.');
+    navigateTo('profile');
+  }
+
+  // Traitement et affichage à la volée du reçu numérisé par l'appareil photo
+  function previewReceipt(input) {
+    if (input.files && input.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const zone = input.previousElementSibling;
+        zone.innerHTML = `<img src="${e.target.result}">`;
+      };
+      reader.readAsDataURL(input.files[0]);
+    }
+  }
+
+  // -- BOOTSTRAP DE L'APPLICATION (CYCLE INITIAL) --
+  window.onload = function() {
+    setTimeout(() => {
+      $('splash').classList.add('hide');
+      navigateTo('onboarding');
+    }, 2000);
+
+    // Initialisation par défaut des sélecteurs de dates aux valeurs du jour
+    $('inc-date').value = today();
+    $('exp-date').value = today();
+    $('bud-start').value = today();
+    $('plan-date').value = today();
+    $('save-date').value = today();
+
+    populateCategorySelect('inc-category', 'income');
+    populateCategorySelect('exp-category', 'expense');
+    populateCategorySelect('plan-category', 'expense');
+    populateCategorySelect('bud-category', 'expense');
+
+    renderIconGrid();
+    renderColorGrid();
+    renderDashboard();
+  };
+</script>
+
+</body>
+</html>
